@@ -5,12 +5,12 @@ let categories = [];
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    fs.readFile('./data/items.json', 'utf8', (err, data) => { // Corrected to .json
+    fs.readFile('./data/items.js', 'utf8', (err, data) => { 
       if (err) {
         reject('Unable to read items file');
       } else {
         items = JSON.parse(data);
-        fs.readFile('./data/categories.json', 'utf8', (err, data) => { // Corrected to .json
+        fs.readFile('./data/categories.js', 'utf8', (err, data) => { 
           if (err) {
             reject('Unable to read categories file');
           } else {
