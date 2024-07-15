@@ -14,15 +14,12 @@ const exphbs = require('express-handlebars');
 const app = express();
 const path = require('path');
 const multer = require("multer");
-const cloudinary = require('cloudinary');
+const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 const storeService = require('./store-service');
 
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
-
-app.engine('.hbs', exphbs.engine(( {extname: '.hbs' })));
-app.set('view engine', '.hbs');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -34,6 +31,36 @@ cloudinary.config({
 
 // Multer setup
 const upload = multer(); // no { storage: storage } since we are not using disk storage
+
+// Custom Handlebars helpers
+const handlebars = exphbs.create({
+  extname: '.hbs',
+  helpers: {
+    navLink: function(url, options){
+      return '<li' + ((url == app.locals.activeRoute) ? ' class="active" ' : '') + '><a href="' + url + '">' + options.fn(this) + '</a></li>';
+    },
+    equal: function(lvalue, rvalue, options) {
+      if (arguments.length < 3)
+        throw new Error("Handlebars Helper equal needs 2 parameters");
+      if (lvalue != rvalue) {
+        return options.inverse(this);
+      } else {
+        return options.fn(this);
+      }
+    }
+  }
+});
+
+app.engine('.hbs', handlebars.engine);
+app.set('view engine', '.hbs');
+
+// Middleware to handle active route
+app.use((req, res, next) => {
+  let route = req.path.substring(1);
+  app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/, "") : route.replace(/\/(.*)/, ""));
+  app.locals.viewingCategory = req.query.category;
+  next();
+});
 
 app.get('/', (req, res) => {
   res.redirect('/about');
@@ -97,40 +124,38 @@ app.get('/item/:value', (req, res) => {
 // POST route to handle item submission
 app.post('/items/add', upload.single('featureImage'), (req, res) => {
   if (req.file) {
-      let streamUpload = (req) => {
-          return new Promise((resolve, reject) => {
-              let stream = cloudinary.uploader.upload_stream(
-                  (error, result) => {
-                      if (result) {
-                          resolve(result);
-                      } else {
-                          reject(error);
-                      }
-                  }
-              );
-              streamifier.createReadStream(req.file.buffer).pipe(stream);
-          });
-      };
-
-      async function upload(req) {
-          let result = await streamUpload(req);
-          return result;
-      }
-
-      upload(req).then((uploaded) => {
-          processItem(uploaded.url);
+    let streamUpload = (req) => {
+      return new Promise((resolve, reject) => {
+        let stream = cloudinary.uploader.upload_stream((error, result) => {
+          if (result) {
+            resolve(result);
+          } else {
+            reject(error);
+          }
+        });
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
       });
+    };
+
+    async function upload(req) {
+      let result = await streamUpload(req);
+      return result;
+    }
+
+    upload(req).then((uploaded) => {
+      processItem(uploaded.url);
+    });
   } else {
-      processItem("");
+    processItem("");
   }
 
   function processItem(imageUrl) {
-      req.body.featureImage = imageUrl;
-      storeService.addItem(req.body).then(() => {
-          res.redirect('/items');
-      }).catch((err) => {
-          res.status(500).render('error', { message: "Unable to add item" });
-      });
+    req.body.featureImage = imageUrl;
+    storeService.addItem(req.body).then(() => {
+      res.redirect('/items');
+    }).catch((err) => {
+      res.status(500).render('error', { message: "Unable to add item" });
+    });
   }
 });
 
