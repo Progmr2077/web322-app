@@ -1,0 +1,19 @@
+{{!-- views/shop.hbs --}}
+<div class="row">
+    {{#each items}}
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <img class="card-img-top" src="{{this.featureImage}}" alt="{{this.title}}">
+            <div class="card-body">
+                <p class="card-text">{{this.title}}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                    </div>
+                    <small class="text-muted">{{this.postDate}}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>

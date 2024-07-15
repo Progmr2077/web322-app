@@ -1,0 +1,28 @@
+{
+    "name": "web322-app",
+    "version": "1.0.0",
+    "description": "web322 assignment 2",
+    "main": "server.js",
+    "scripts": {
+        "test": "node server.js",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Progmr2077/web322-work.git"
+    },
+    "author": "Jacob Rivera",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Progmr2077/web322-work/issues"
+    },
+    "homepage": "https://github.com/Progmr2077/web322-work#readme",
+    "dependencies": {
+        "cloudinary": "^2.2.0",
+        "express": "^4.19.2",
+        "express-handlebars": "^7.1.3",
+        "multer": "^1.4.5-lts.1",
+        "node": "^18.20.4",
+        "streamifier": "^0.1.1"
+    }
+}

@@ -1,0 +1,28 @@
+body 
+{
+  background-color: firebrick;
+}
+
+h2 
+{
+    text-align: center;
+    font-family:'Times New Roman', Times, serif;
+    font-size: 40px;
+    color: gold;
+}
+
+.container-fluid
+{
+    background-color: black;
+}
+
+p
+{
+    text-align: center;
+    color: black;
+}
+
+.nav-link
+{
+    color: white;
+}
