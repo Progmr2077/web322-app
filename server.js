@@ -9,6 +9,8 @@ Cyclic Web App URL:
 GitHub Repository URL: https://github.com/Progmr2077/web322-app.git
 ********************************************************************************/
 
+// server.js
+
 const express = require('express');
 const exphbs = require('express-handlebars');
 const app = express();
@@ -63,7 +65,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.redirect('/shop');
+  res.redirect('/about');
 });
 
 app.get('/about', (req, res) => {
@@ -73,28 +75,19 @@ app.get('/about', (req, res) => {
 app.get('/shop', (req, res) => {
   let viewData = {};
 
-  storeService.getPublishedItems().then((data) => {
+  storeService.getCategories().then((data) => {
+    viewData.categories = data;
+    if (req.query.category) {
+      return storeService.getPublishedItemsByCategory(req.query.category);
+    } else {
+      return storeService.getPublishedItems();
+    }
+  }).then((data) => {
     viewData.items = data;
   }).catch(() => {
     viewData.itemsMessage = "no results";
-  }).then(storeService.getCategories().then((data) => {
-    viewData.categories = data;
-  }).catch(() => {
-    viewData.categoriesMessage = "no results";
-  })).then(() => {
-    if (req.query.category) {
-      storeService.getPublishedItemsByCategory(req.query.category).then((data) => {
-        viewData.items = data;
-      }).catch(() => {
-        viewData.itemsMessage = "no results";
-      }).then(() => {
-        res.render("shop", { data: viewData });
-      });
-    } else {
-      res.render("shop", { data: viewData });
-    }
-  }).catch((err) => {
-    res.render("shop", { data: { message: "no results" } });
+  }).finally(() => {
+    res.render('shop', { data: viewData });
   });
 });
 
@@ -124,7 +117,7 @@ app.get('/categories', (req, res) => {
   storeService.getCategories().then((data) => {
     res.render('categories', { categories: data });
   }).catch((err) => {
-    res.render('categories', { message: "no results" });
+    res.status(404).json({ message: err });
   });
 });
 
@@ -188,5 +181,5 @@ storeService.initialize().then(() => {
     console.log('Express http server listening on', process.env.PORT || 8080);
   });
 }).catch((err) => {
-  console.error(err);
+  console.log('Unable to start server:', err);
 });

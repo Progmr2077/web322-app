@@ -11,7 +11,7 @@
    },
    {
       "id":2,
-      "category":4,
+      "category":1,
       "postDate":"2024-07-14",
       "featureImage":"https://cdn.pixabay.com/photo/2018/04/02/17/35/nature-3284504_1280.jpg",
       "price":35.99,
@@ -81,7 +81,7 @@
    },
    {
       "id":9,
-      "category":4,
+      "category":1,
       "postDate":"2024-07-14",
       "featureImage":"https://cdn.pixabay.com/photo/2016/03/27/20/55/arm-1284248_1280.jpg",
       "price":2.46,
@@ -91,7 +91,7 @@
    },
    {
       "id":10,
-      "category":4,
+      "category":1,
       "postDate":"2024-07-14",
       "featureImage":"https://cdn.pixabay.com/photo/2016/05/24/17/38/stationery-1412848_1280.jpg",
       "price":3.99,

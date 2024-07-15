@@ -1,7 +1,7 @@
 [
    {
       "id":1,
-      "category":"Home, Garden"
+      "category":"Home, Schooling"
    },
    {
       "id":2,
@@ -14,9 +14,5 @@
    {
       "id":4,
       "category":"Sports & Outdoors"
-   },
-   {
-      "id":5,
-      "category":"Pets"
    }
 ]
