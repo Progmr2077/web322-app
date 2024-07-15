@@ -5,14 +5,14 @@ let categories = [];
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    fs.readFile('./data/items.js', 'utf8', (err, data) => {
+    fs.readFile('./data/items.json', 'utf8', (err, data) => { // Corrected to .json
       if (err) {
-        reject('unable to read file');
+        reject('Unable to read items file');
       } else {
         items = JSON.parse(data);
-        fs.readFile('./data/categories.js', 'utf8', (err, data) => {
+        fs.readFile('./data/categories.json', 'utf8', (err, data) => { // Corrected to .json
           if (err) {
-            reject('unable to read file');
+            reject('Unable to read categories file');
           } else {
             categories = JSON.parse(data);
             resolve();
@@ -26,7 +26,7 @@ function initialize() {
 function getAllItems() {
   return new Promise((resolve, reject) => {
     if (items.length === 0) {
-      reject('no results returned');
+      reject('No items found');
     } else {
       resolve(items);
     }
@@ -37,7 +37,7 @@ function getPublishedItems() {
   return new Promise((resolve, reject) => {
     const publishedItems = items.filter((item) => item.published === true);
     if (publishedItems.length === 0) {
-      reject('no results returned');
+      reject('No published items found');
     } else {
       resolve(publishedItems);
     }
@@ -47,65 +47,57 @@ function getPublishedItems() {
 function getCategories() {
   return new Promise((resolve, reject) => {
     if (categories.length === 0) {
-      reject('no results returned');
+      reject('No categories found');
     } else {
       resolve(categories);
     }
   });
 }
 
-// Add the addItem function
 function addItem(itemData) {
   return new Promise((resolve, reject) => {
     if (!itemData) {
-      reject("No item data provided");
+      reject('No item data provided');
     } else {
-      // Set published to false if it's undefined
       itemData.published = itemData.published ? true : false;
 
-      // Set the id property
-      itemData.id = items.length + 1;
+      // Ensure unique ID generation (example: using the current timestamp)
+      itemData.id = items.length > 0 ? Math.max(...items.map(item => item.id)) + 1 : 1;
 
-      // Push the new item to the items array
       items.push(itemData);
-
-      // Resolve the promise with the updated item data
       resolve(itemData);
     }
   });
 }
 
-// Add the getItemsByCategory function
 function getItemsByCategory(category) {
   return new Promise((resolve, reject) => {
     const filteredItems = items.filter(item => item.category === parseInt(category));
     if (filteredItems.length === 0) {
-      reject('no results returned');
+      reject('No items found for this category');
     } else {
       resolve(filteredItems);
     }
   });
 }
 
-// Add the getItemsByMinDate function
 function getItemsByMinDate(minDateStr) {
   return new Promise((resolve, reject) => {
     const minDate = new Date(minDateStr);
     const filteredItems = items.filter(item => new Date(item.postDate) >= minDate);
     if (filteredItems.length === 0) {
-      reject('no results returned');
+      reject('No items found after this date');
     } else {
       resolve(filteredItems);
     }
   });
 }
 
-// Add the getItemById function
 function getItemById(id) {
   return new Promise((resolve, reject) => {
     const item = items.find(item => item.id === parseInt(id));
     if (!item) {
-      reject('no result returned');
+      reject('No item found with this ID');
     } else {
       resolve(item);
     }
@@ -120,5 +112,5 @@ module.exports = {
   addItem,
   getItemsByCategory,
   getItemsByMinDate,
-  getItemById // Export the getItemById function
+  getItemById
 };
