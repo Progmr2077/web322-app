@@ -104,6 +104,17 @@ function getItemById(id) {
   });
 }
 
+module.exports.getPublishedItemsByCategory = function(category) {
+  return new Promise((resolve, reject) => {
+    let filteredItems = items.filter(item => item.published && item.category === category);
+    if (filteredItems.length > 0) {
+      resolve(filteredItems);
+    } else {
+      reject("no results");
+    }
+  });
+};
+
 module.exports = {
   initialize,
   getAllItems,

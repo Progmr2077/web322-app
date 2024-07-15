@@ -1,19 +1,47 @@
-{{!-- views/shop.hbs --}}
+<!-- views/shop.hbs -->
 <div class="row">
-    {{#each items}}
-    <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
-            <img class="card-img-top" src="{{#if this.featureImage}}{{this.featureImage}}{{else}}/path/to/placeholder.jpg{{/if}}" alt="{{this.title}}">
-            <div class="card-body">
-                <p class="card-text">{{this.title}}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                        <a href="/item/{{this.id}}" class="btn btn-sm btn-outline-secondary">View</a>
-                    </div>
-                    <small class="text-muted">{{this.postDate}}</small>
-                </div>
-            </div>
-        </div>
+  <div class="col-md-12">
+    <h2>Shop</h2>
+    <hr />
+    {{#if data.categories}}
+    <div class="col-md-3">
+      <h3>Categories</h3>
+      <ul class="list-group">
+        {{#each data.categories}}
+        <li class="list-group-item">
+          <a href="/shop?category={{id}}">{{category}}</a>
+        </li>
+        {{/each}}
+      </ul>
     </div>
-    {{/each}}
+    {{else}}
+    <div class="col-md-3">
+      <strong>{{data.categoriesMessage}}</strong>
+    </div>
+    {{/if}}
+
+    {{#if data.items}}
+    <div class="col-md-9">
+      <h3>Items</h3>
+      <div class="row">
+        {{#each data.items}}
+        <div class="col-md-4">
+          <div class="card">
+            <img class="card-img-top" src="{{featureImage}}" alt="{{title}}">
+            <div class="card-body">
+              <h5 class="card-title">{{title}}</h5>
+              <p class="card-text">{{description}}</p>
+              <a href="/item/{{id}}" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{else}}
+    <div class="col-md-9">
+      <strong>{{data.itemsMessage}}</strong>
+    </div>
+    {{/if}}
+  </div>
 </div>

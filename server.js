@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  res.redirect('/about');
+  res.redirect('/shop');
 });
 
 app.get('/about', (req, res) => {
@@ -71,10 +71,30 @@ app.get('/about', (req, res) => {
 });
 
 app.get('/shop', (req, res) => {
+  let viewData = {};
+
   storeService.getPublishedItems().then((data) => {
-    res.render('shop', { title: 'Shop', items: data });
+    viewData.items = data;
+  }).catch(() => {
+    viewData.itemsMessage = "no results";
+  }).then(storeService.getCategories().then((data) => {
+    viewData.categories = data;
+  }).catch(() => {
+    viewData.categoriesMessage = "no results";
+  })).then(() => {
+    if (req.query.category) {
+      storeService.getPublishedItemsByCategory(req.query.category).then((data) => {
+        viewData.items = data;
+      }).catch(() => {
+        viewData.itemsMessage = "no results";
+      }).then(() => {
+        res.render("shop", { data: viewData });
+      });
+    } else {
+      res.render("shop", { data: viewData });
+    }
   }).catch((err) => {
-    res.status(404).render('error', { message: err });
+    res.render("shop", { data: { message: "no results" } });
   });
 });
 
@@ -104,7 +124,7 @@ app.get('/categories', (req, res) => {
   storeService.getCategories().then((data) => {
     res.render('categories', { categories: data });
   }).catch((err) => {
-    res.status(404).json({ message: err });
+    res.render('categories', { message: "no results" });
   });
 });
 
