@@ -44,8 +44,8 @@
       "category":3,
       "postDate":"2024-07-14",
       "featureImage":"https://cdn.pixabay.com/photo/2021/12/07/08/35/man-6852605_1280.jpg",
-      "price":30.00,
-      "title":"TShirt",
+      "price":30.99,
+      "title":"T-Shirt",
       "body":"T-shirt for looking casual and stylish.",
       "published":true
    },

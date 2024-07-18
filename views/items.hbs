@@ -1,62 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <link rel="stylesheet" href="/public/css/main.css"> 
-    <title>Items</title>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand" href="/">WEB322 - Jacob Rivera</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/shop">Shop</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">About</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto"> 
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/items">Items</a> 
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/categories">Categories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/items/add">Add Item</a>
-                    </li>
-                </ul>
-            </div>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Items</h2>
+        <hr />
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item ID</th>
+                        <th>Title</th>
+                        <th>Post Date</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Published</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each items}}
+                    <tr>
+                        <td>{{id}}</td>
+                        <td>{{title}}</td>
+                        <td>{{postDate}}</td>
+                        <td>{{price}}</td>
+                        <td><a href="/items?category={{categoryId}}">{{category}}</a></td>
+                        <td>{{published}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
-    </nav>
-    <div class="container" style="padding-top: 90px;">
-        <h1>Items</h1>
-        {{#if items}}
-            <ul class="list-group">
-                {{#each items}}
-                    <li class="list-group-item">
-                        <h5>{{this.title}}</h5>
-                        <p>Description: {{this.body}}</p>
-                        <p>Date: {{this.postDate}}</p>
-                        {{#if this.featureImage}}
-                            <img src="{{this.featureImage}}" alt="{{this.title}}" class="img-thumbnail">
-                        {{/if}}
-                    </li>
-                {{/each}}
-            </ul>
-        {{else}}
-            <p>No items found.</p>
-        {{/if}}
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-</body>
-</html>
+</div>
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        {{#unless items}}
+        <strong>{{message}}</strong>
+        {{/unless}}
+    </div>
+</div>
