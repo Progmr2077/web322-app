@@ -84,27 +84,29 @@ app.get('/shop', async (req, res) => {
   let viewData = {};
 
   try {
-    viewData.items = req.query.category 
-      ? await storeService.getPublishedItemsByCategory(req.query.category)
-      : await storeService.getPublishedItems();
-    
-    viewData.items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
+    let items = [];
+    if (req.query.category) {
+      items = await itemData.getPublishedItemsByCategory(req.query.category);
+    } else {
+      items = await itemData.getPublishedItems();
+    }
+    items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
+    viewData.items = items;
   } catch (err) {
-    viewData.message = "No results";
+    viewData.message = "no results";
   }
 
   try {
-    viewData.categories = await storeService.getCategories();
+    viewData.post = await itemData.getItemById(req.query.id);
   } catch (err) {
-    viewData.categoriesMessage = "No results";
+    viewData.message = "no results";
   }
 
-  if (req.params.id) {
-    try {
-      viewData.post = await storeService.getItemById(req.params.id);
-    } catch (err) {
-      viewData.message = "No results";
-    }
+  try {
+    let categories = await itemData.getCategories();
+    viewData.categories = categories;
+  } catch (err) {
+    viewData.categoriesMessage = "no results";
   }
 
   res.render("shop", { data: viewData });
