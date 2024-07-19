@@ -80,7 +80,6 @@ app.get('/about', (req, res) => {
   res.render('about', { title: 'About' });
 });
 
-
 app.get("/shop", async (req, res) => {
   // Declare an object to store properties for the view
   let viewData = {};
