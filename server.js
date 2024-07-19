@@ -80,33 +80,48 @@ app.get('/about', (req, res) => {
   res.render('about', { title: 'About' });
 });
 
-app.get('/shop', async (req, res) => {
+
+app.get("/shop", async (req, res) => {
+  // Declare an object to store properties for the view
   let viewData = {};
 
   try {
-    viewData.items = req.query.category 
-      ? await storeService.getPublishedItemsByCategory(req.query.category)
-      : await storeService.getPublishedItems();
-    
-    viewData.items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
+    // declare empty array to hold "item" objects
+    let items = [];
+
+    // if there's a "category" query, filter the returned items by category
+    if (req.query.category) {
+      // Obtain the published "item" by category
+      items = await storeService.getPublishedItemsByCategory(req.query.category);
+    } else {
+      // Obtain the published "items"
+      items = await storeService.getPublishedItems();
+    }
+
+    // sort the published items by itemDate
+    items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
+
+    // get the latest item from the front of the list (element 0)
+    let item = items[0];
+
+    // store the "items" and "item" data in the viewData object (to be passed to the view)
+    viewData.items = items;
+    viewData.item = item;
   } catch (err) {
-    viewData.message = "No results";
+    viewData.message = "no results";
   }
 
   try {
-    viewData.categories = await storeService.getCategories();
+    // Obtain the full list of "categories"
+    let categories = await storeService.getCategories();
+
+    // store the "categories" data in the viewData object (to be passed to the view)
+    viewData.categories = categories;
   } catch (err) {
-    viewData.categoriesMessage = "No results";
+    viewData.categoriesMessage = "no results";
   }
 
-  if (req.params.id) {
-    try {
-      viewData.post = await storeService.getItemById(req.params.id);
-    } catch (err) {
-      viewData.message = "No results";
-    }
-  }
-
+  // render the "shop" view with all of the data (viewData)
   res.render("shop", { data: viewData });
 });
 
