@@ -16,7 +16,7 @@ const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
-const itemData = require('./store-service');
+const storeService = require('./store-service');
 
 const app = express();
 
