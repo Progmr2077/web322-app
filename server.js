@@ -6,7 +6,7 @@ Name: Jacob Rivera
 Student ID: 109641233
 Date: June 7th, 2024
 Cyclic Web App URL: 
-GitHub Repository URL: https://github.com/Progmr2077/web322-app.git
+GitHub Repository URL: https://github.com/Progmr2077/web322-app
 ********************************************************************************/
 
 // server.js
