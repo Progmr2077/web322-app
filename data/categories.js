@@ -1,11 +1,11 @@
 [
    {
       "id":1,
-      "category":"Home, Schooling"
+      "category":"School"
    },
    {
       "id":2,
-      "category":"Electronics, Computers, Video Games"
+      "category":"Electronics"
    },
    {
       "id":3,
@@ -13,6 +13,6 @@
    },
    {
       "id":4,
-      "category":"Sports & Outdoors"
+      "category":"Sports"
    }
 ]
