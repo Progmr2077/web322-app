@@ -222,8 +222,15 @@ app.get('/items/delete/:id', async (req, res) => {
   }
 });
 
-app.get('/items/add', (req, res) => {
-  res.render('addPost', { title: 'Add Item' });
+app.get('/items/add', async (req, res) => {
+  try {
+    // Fetch categories to populate the dropdown in the addPost view
+    let categories = await storeService.getCategories();
+    res.render('addPost', { title: 'Add Item', categories: categories });
+  } catch {
+    // If fetching categories fails, pass an empty array
+    res.render('addPost', { title: 'Add Item', categories: [] });
+  }
 });
 
 app.get('/item/:value', async (req, res) => {
