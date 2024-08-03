@@ -65,6 +65,12 @@ const handlebars = exphbs.create({
         throw new Error("Handlebars Helper equal needs 2 parameters");
       }
       return lvalue != rvalue ? options.inverse(this) : options.fn(this);
+    },
+    formatDate: (dateObj) => {
+      let year = dateObj.getFullYear();
+      let month = (dateObj.getMonth() + 1).toString();
+      let day = dateObj.getDate().toString();
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
   }
 });
