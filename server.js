@@ -9,7 +9,6 @@ Cyclic Web App URL:
 GitHub Repository URL: https://github.com/Progmr2077/web322-app
 ********************************************************************************/
 
-// server.js
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
@@ -163,18 +162,26 @@ app.get('/items', async (req, res) => {
     } else {
       items = await storeService.getAllItems();
     }
-    res.render('items', { items: items, category: req.query.category || null });
+    if (items.length > 0) {
+      res.render('items', { items: items, category: req.query.category || null });
+    } else {
+      res.render('items', { message: "no results" });
+    }
   } catch {
-    res.render('items', { message: "No results" });
+    res.render('items', { message: "no results" });
   }
 });
 
 app.get('/categories', async (req, res) => {
   try {
     let categories = await storeService.getCategories();
-    res.render('categories', { categories: categories });
+    if (categories.length > 0) {
+      res.render('categories', { categories: categories });
+    } else {
+      res.render('categories', { message: "no results" });
+    }
   } catch {
-    res.render('categories', { message: "No results" });
+    res.render('categories', { message: "no results" });
   }
 });
 
