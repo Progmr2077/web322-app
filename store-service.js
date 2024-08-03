@@ -50,7 +50,7 @@ const Category = sequelize.define('Category', {
 });
 
 // Define the relationship between Item and Category
-Item.belongsTo(Category, { foreignKey: 'category' });
+Item.belongsTo(Category, { foreignKey: 'categoryId' });
 
 module.exports.initialize = function() {
   return new Promise((resolve, reject) => {
@@ -95,7 +95,7 @@ module.exports.getPublishedItemsByCategory = function(categoryId) {
     Item.findAll({
       where: {
         published: true,
-        category: categoryId
+        categoryId: categoryId
       }
     })
       .then(data => {
@@ -122,7 +122,7 @@ module.exports.getCategories = function() {
 module.exports.getItemsByCategory = function(categoryId) {
   return new Promise((resolve, reject) => {
     Item.findAll({
-      where: { category: categoryId }
+      where: { categoryId: categoryId }
     })
       .then(data => {
         resolve(data);
@@ -189,5 +189,52 @@ module.exports.addItem = function(itemData) {
       .catch(err => {
         reject("Unable to create item");
       });
+  });
+};
+
+// Add a new category
+module.exports.addCategory = function(categoryData) {
+  return new Promise((resolve, reject) => {
+    // Replace blank values with null
+    for (let key in categoryData) {
+      if (categoryData[key] === "") {
+        categoryData[key] = null;
+      }
+    }
+
+    // Create a new category
+    Category.create(categoryData)
+      .then(() => resolve())
+      .catch(() => reject("unable to create category"));
+  });
+};
+
+// Delete a category by ID
+module.exports.deleteCategoryById = function(id) {
+  return new Promise((resolve, reject) => {
+    Category.destroy({ where: { id: id } })
+      .then((result) => {
+        if (result > 0) {
+          resolve();
+        } else {
+          reject("Category not found or not deleted");
+        }
+      })
+      .catch(() => reject("unable to delete category"));
+  });
+};
+
+// Delete a post by ID
+module.exports.deletePostById = function(id) {
+  return new Promise((resolve, reject) => {
+    Item.destroy({ where: { id: id } })
+      .then((result) => {
+        if (result > 0) {
+          resolve();
+        } else {
+          reject("Post not found or not deleted");
+        }
+      })
+      .catch(() => reject("unable to delete post"));
   });
 };
