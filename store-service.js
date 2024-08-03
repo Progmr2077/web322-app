@@ -66,42 +66,128 @@ module.exports.initialize = function() {
 
 module.exports.getAllItems = function() {
   return new Promise((resolve, reject) => {
-    reject();
+    Item.findAll()
+      .then(data => {
+        resolve(data);
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
   });
 };
 
 module.exports.getPublishedItems = function() {
   return new Promise((resolve, reject) => {
-    reject();
+    Item.findAll({
+      where: { published: true }
+    })
+      .then(data => {
+        resolve(data);
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
   });
 };
 
 module.exports.getPublishedItemsByCategory = function(categoryId) {
   return new Promise((resolve, reject) => {
-    reject();
+    Item.findAll({
+      where: {
+        published: true,
+        category: categoryId
+      }
+    })
+      .then(data => {
+        resolve(data);
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
   });
 };
 
 module.exports.getCategories = function() {
   return new Promise((resolve, reject) => {
-    reject();
+    Category.findAll()
+      .then(data => {
+        resolve(data);
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
   });
 };
 
 module.exports.getItemsByCategory = function(categoryId) {
   return new Promise((resolve, reject) => {
-    reject();
+    Item.findAll({
+      where: { category: categoryId }
+    })
+      .then(data => {
+        resolve(data);
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
+  });
+};
+
+module.exports.getItemsByMinDate = function(minDateStr) {
+  const { gte } = Sequelize.Op;
+  return new Promise((resolve, reject) => {
+    Item.findAll({
+      where: {
+        postDate: {
+          [gte]: new Date(minDateStr)
+        }
+      }
+    })
+      .then(data => {
+        resolve(data);
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
   });
 };
 
 module.exports.getItemById = function(id) {
   return new Promise((resolve, reject) => {
-    reject();
+    Item.findAll({
+      where: { id: id }
+    })
+      .then(data => {
+        if (data.length > 0) {
+          resolve(data[0]);
+        } else {
+          reject("No results returned");
+        }
+      })
+      .catch(err => {
+        reject("No results returned");
+      });
   });
 };
 
 module.exports.addItem = function(itemData) {
   return new Promise((resolve, reject) => {
-    reject();
+    itemData.published = (itemData.published) ? true : false;
+
+    for (let key in itemData) {
+      if (itemData[key] === "") {
+        itemData[key] = null;
+      }
+    }
+
+    itemData.postDate = new Date();
+
+    Item.create(itemData)
+      .then(() => {
+        resolve();
+      })
+      .catch(err => {
+        reject("Unable to create item");
+      });
   });
 };
