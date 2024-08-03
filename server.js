@@ -185,6 +185,43 @@ app.get('/categories', async (req, res) => {
   }
 });
 
+// New route to render add category page
+app.get('/categories/add', (req, res) => {
+  res.render('addCategory', { title: 'Add Category' });
+});
+
+// New route to handle adding a category
+app.post('/categories/add', async (req, res) => {
+  try {
+    await storeService.addCategory(req.body);
+    res.redirect('/categories');
+  } catch {
+    res.status(500).send('Unable to create category');
+  }
+});
+
+// New route to delete a category by ID
+app.get('/categories/delete/:id', async (req, res) => {
+  const categoryId = req.params.id;
+  try {
+    await storeService.deleteCategoryById(categoryId);
+    res.redirect('/categories');
+  } catch {
+    res.status(500).send('Unable to Remove Category / Category not found');
+  }
+});
+
+// New route to delete an item by ID
+app.get('/items/delete/:id', async (req, res) => {
+  const itemId = req.params.id;
+  try {
+    await storeService.deletePostById(itemId);
+    res.redirect('/items');
+  } catch {
+    res.status(500).send('Unable to Remove Item / Item not found');
+  }
+});
+
 app.get('/items/add', (req, res) => {
   res.render('addPost', { title: 'Add Item' });
 });
