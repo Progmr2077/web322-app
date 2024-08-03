@@ -5,7 +5,7 @@ been copied manually or electronically from any other source (including 3rd part
 Name: Jacob Rivera
 Student ID: 109641233
 Date: June 7th, 2024
-Cyclic Web App URL: 
+Cyclic Web App URL: https://vercel.com/new/progmr2077s-projects/success?developer-id=&external-id=&redirect-url=&branch=main&deploymentUrl=web322-qnmrguwfl-progmr2077s-projects.vercel.app&projectName=web322-app&s=https%3A%2F%2Fgithub.com%2FProgmr2077%2Fweb322-app&gitOrgLimit=&hasTrialAvailable=1&totalProjects=1&slug=app-future&slug=en-US&slug=new&slug=progmr2077s-projects&slug=success
 GitHub Repository URL: https://github.com/Progmr2077/web322-app
 ********************************************************************************/
 
