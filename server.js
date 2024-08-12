@@ -15,11 +15,7 @@ const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
-const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
-const bcrypt = require('bcryptjs');
 const storeService = require('./store-service');
-const authData = require('./auth-service'); // Import authentication functions
 
 const app = express();
 
@@ -36,27 +32,6 @@ cloudinary.config({
 
 // Multer setup
 const upload = multer();
-
-// Configure session store
-const store = new MongoDBStore({
-  uri: 'mongodb://localhost:27017/your_database', // Update with your MongoDB URI
-  collection: 'sessions'
-});
-
-store.on('error', function(error) {
-  console.log(error);
-});
-
-// Configure session middleware
-app.use(session({
-  secret: 'your_secret_key', // Replace with a strong secret key
-  resave: true,
-  saveUninitialized: true,
-  store: store,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 // 1 day
-  }
-}));
 
 // Middleware to handle active route
 app.use((req, res, next) => {
@@ -306,53 +281,6 @@ app.post('/item/update', upload.single('featureImage'), async (req, res) => {
     res.render('error', { message: "Failed to update item" });
   }
 });
-
-// User authentication routes
-// GET /login
-app.get('/login', (req, res) => {
-  res.render('login', { title: 'Login' });
-});
-
-// POST /login
-app.post('/login', async (req, res) => {
-  try {
-    const user = await authData.checkUser(req.body);
-    req.session.user = {
-      userName: user.userName,
-      email: user.email,
-      loginHistory: user.loginHistory
-    };
-    res.redirect('/items');
-  } catch (err) {
-    res.render('login', {
-      errorMessage: err,
-      userName: req.body.userName
-    });
-  }
-});
-
-// GET /logout
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      return res.status(500).send('Unable to log out.');
-    }
-    res.redirect('/');
-  });
-});
-
-// GET /userHistory
-app.get('/userHistory', ensureLogin, (req, res) => {
-  res.render('userHistory');
-});
-
-// Middleware to ensure user is logged in
-function ensureLogin(req, res, next) {
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  next();
-}
 
 const HTTP_PORT = process.env.PORT || 8080;
 
