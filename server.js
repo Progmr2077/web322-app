@@ -17,6 +17,8 @@ const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 const storeService = require('./store-service');
 
+const authData = require('./auth-service');
+
 const app = express();
 
 app.use(express.static('public'));
@@ -291,3 +293,14 @@ storeService.initialize().then(() => {
 }).catch((err) => {
   console.log(err);
 });
+
+storeData.initialize()
+  .then(authData.initialize)
+  .then(function () {
+    app.listen(HTTP_PORT, function () {
+      console.log("app listening on: " + HTTP_PORT);
+    });
+  })
+  .catch(function (err) {
+    console.log("unable to start server: " + err);
+  });
