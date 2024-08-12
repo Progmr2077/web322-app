@@ -1,5 +1,9 @@
 const Sequelize = require('sequelize');
-var sequelize = new Sequelize('JacobDB', 'JacobDB_owner', 'K82NuwEWrPBQ', {
+const fs = require('fs');
+const path = require('path');
+
+// Set up Sequelize connection
+const sequelize = new Sequelize('JacobDB', 'JacobDB_owner', 'K82NuwEWrPBQ', {
   host: 'ep-long-voice-a5a719e9.us-east-2.aws.neon.tech',
   dialect: 'postgres',
   port: 5432,
@@ -8,9 +12,6 @@ var sequelize = new Sequelize('JacobDB', 'JacobDB_owner', 'K82NuwEWrPBQ', {
   },
   query: { raw: true }
 });
-
-const fs = require('fs');
-const path = require('path');
 
 // Define the Item model
 const Item = sequelize.define('Item', {
@@ -52,189 +53,157 @@ const Category = sequelize.define('Category', {
 // Define the relationship between Item and Category
 Item.belongsTo(Category, { foreignKey: 'categoryId' });
 
-module.exports.initialize = function() {
-  return new Promise((resolve, reject) => {
-    sequelize.sync()
-      .then(() => {
-        resolve();
-      })
-      .catch(err => {
-        reject("Unable to sync the database");
-      });
-  });
+// Initialize the database
+module.exports.initialize = async function() {
+  try {
+    await sequelize.sync();
+  } catch (err) {
+    throw new Error("Unable to sync the database: " + err.message);
+  }
 };
 
-module.exports.getAllItems = function() {
-  return new Promise((resolve, reject) => {
-    Item.findAll()
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
+// Get all items
+module.exports.getAllItems = async function() {
+  try {
+    return await Item.findAll();
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
 };
 
-module.exports.getPublishedItems = function() {
-  return new Promise((resolve, reject) => {
-    Item.findAll({
+// Get published items
+module.exports.getPublishedItems = async function() {
+  try {
+    return await Item.findAll({
       where: { published: true }
-    })
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
+    });
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
 };
 
-module.exports.getPublishedItemsByCategory = function(categoryId) {
-  return new Promise((resolve, reject) => {
-    Item.findAll({
+// Get published items by category
+module.exports.getPublishedItemsByCategory = async function(categoryId) {
+  try {
+    return await Item.findAll({
       where: {
         published: true,
         categoryId: categoryId
       }
-    })
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
+    });
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
 };
 
-module.exports.getCategories = function() {
-  return new Promise((resolve, reject) => {
-    Category.findAll()
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
+// Get all categories
+module.exports.getCategories = async function() {
+  try {
+    return await Category.findAll();
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
 };
 
-module.exports.getItemsByCategory = function(categoryId) {
-  return new Promise((resolve, reject) => {
-    Item.findAll({
+// Get items by category
+module.exports.getItemsByCategory = async function(categoryId) {
+  try {
+    return await Item.findAll({
       where: { categoryId: categoryId }
-    })
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
+    });
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
 };
 
-module.exports.getItemsByMinDate = function(minDateStr) {
-  const { gte } = Sequelize.Op;
-  return new Promise((resolve, reject) => {
-    Item.findAll({
+// Get items by minimum date
+module.exports.getItemsByMinDate = async function(minDateStr) {
+  const { Op } = Sequelize;
+  try {
+    return await Item.findAll({
       where: {
         postDate: {
-          [gte]: new Date(minDateStr)
+          [Op.gte]: new Date(minDateStr)
         }
       }
-    })
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
+    });
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
 };
 
-module.exports.getItemById = function(id) {
-  return new Promise((resolve, reject) => {
-    Item.findAll({
-      where: { id: id }
-    })
-      .then(data => {
-        if (data.length > 0) {
-          resolve(data[0]);
-        } else {
-          reject("No results returned");
-        }
-      })
-      .catch(err => {
-        reject("No results returned");
-      });
-  });
-};
-
-module.exports.addItem = function(itemData) {
-  return new Promise((resolve, reject) => {
-    itemData.published = (itemData.published) ? true : false;
-
-    for (let key in itemData) {
-      if (itemData[key] === "") {
-        itemData[key] = null;
-      }
+// Get item by ID
+module.exports.getItemById = async function(id) {
+  try {
+    const item = await Item.findByPk(id);
+    if (item) {
+      return item;
+    } else {
+      throw new Error("No results returned");
     }
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
+};
 
-    itemData.postDate = new Date();
+// Add a new item
+module.exports.addItem = async function(itemData) {
+  itemData.published = Boolean(itemData.published);
 
-    Item.create(itemData)
-      .then(() => {
-        resolve();
-      })
-      .catch(err => {
-        reject("Unable to create item");
-      });
-  });
+  for (let key in itemData) {
+    if (itemData[key] === "") {
+      itemData[key] = null;
+    }
+  }
+
+  itemData.postDate = new Date();
+
+  try {
+    await Item.create(itemData);
+  } catch (err) {
+    throw new Error("Unable to create item: " + err.message);
+  }
 };
 
 // Add a new category
-module.exports.addCategory = function(categoryData) {
-  return new Promise((resolve, reject) => {
-    // Replace blank values with null
-    for (let key in categoryData) {
-      if (categoryData[key] === "") {
-        categoryData[key] = null;
-      }
+module.exports.addCategory = async function(categoryData) {
+  for (let key in categoryData) {
+    if (categoryData[key] === "") {
+      categoryData[key] = null;
     }
+  }
 
-    // Create a new category
-    Category.create(categoryData)
-      .then(() => resolve())
-      .catch(() => reject("unable to create category"));
-  });
+  try {
+    await Category.create(categoryData);
+  } catch (err) {
+    throw new Error("Unable to create category: " + err.message);
+  }
 };
 
 // Delete a category by ID
-module.exports.deleteCategoryById = function(id) {
-  return new Promise((resolve, reject) => {
-    Category.destroy({ where: { id: id } })
-      .then((result) => {
-        if (result > 0) {
-          resolve();
-        } else {
-          reject("Category not found or not deleted");
-        }
-      })
-      .catch(() => reject("unable to delete category"));
-  });
+module.exports.deleteCategoryById = async function(id) {
+  try {
+    const result = await Category.destroy({ where: { id: id } });
+    if (result > 0) {
+      return;
+    } else {
+      throw new Error("Category not found or not deleted");
+    }
+  } catch (err) {
+    throw new Error("Unable to delete category: " + err.message);
+  }
 };
 
 // Delete a post by ID
-module.exports.deletePostById = function(id) {
-  return new Promise((resolve, reject) => {
-    Item.destroy({ where: { id: id } })
-      .then((result) => {
-        if (result > 0) {
-          resolve();
-        } else {
-          reject("Post not found or not deleted");
-        }
-      })
-      .catch(() => reject("unable to delete post"));
-  });
+module.exports.deletePostById = async function(id) {
+  try {
+    const result = await Item.destroy({ where: { id: id } });
+    if (result > 0) {
+      return;
+    } else {
+      throw new Error("Post not found or not deleted");
+    }
+  } catch (err) {
+    throw new Error("Unable to delete post: " + err.message);
+  }
 };
