@@ -17,7 +17,39 @@ const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 const storeService = require('./store-service');
 
+const clientSessions = require('client-sessions');
+
+app.use(clientSessions({
+  cookieName: 'session',
+  secret: 'your_secret_key',
+  duration: 30 * 60 * 1000, // 30 minutes
+  activeDuration: 5 * 60 * 1000 // 5 minutes
+}));
+
+app.use(function (req, res, next) {
+  res.locals.session = req.session;
+  next();
+});
+
+function ensureLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+}
+
 const authData = require('./auth-service');
+
+storeData.initialize()
+  .then(authData.initialize)
+  .then(function () {
+    app.listen(HTTP_PORT, function () {
+      console.log("app listening on: " + HTTP_PORT);
+    });
+  })
+  .catch(function (err) {
+    console.log("unable to start server: " + err);
+  });
 
 const app = express();
 
@@ -293,14 +325,3 @@ storeService.initialize().then(() => {
 }).catch((err) => {
   console.log(err);
 });
-
-storeData.initialize()
-  .then(authData.initialize)
-  .then(function () {
-    app.listen(HTTP_PORT, function () {
-      console.log("app listening on: " + HTTP_PORT);
-    });
-  })
-  .catch(function (err) {
-    console.log("unable to start server: " + err);
-  });
