@@ -14,7 +14,7 @@
                         <tr>
                             <th>Category ID</th>
                             <th>Category Name</th>
-                            <th></th> <!-- Header for the remove button column -->
+                            <th class="text-center">Actions</th> <!-- Added text-center for alignment -->
                         </tr>
                     </thead>
                     <tbody>
@@ -22,7 +22,7 @@
                         <tr>
                             <td><a href="/items?category={{id}}">{{id}}</a></td>
                             <td><a href="/items?category={{id}}">{{category}}</a></td>
-                            <td>
+                            <td class="text-center">
                                 <a href="/categories/delete/{{id}}" 
                                    class="btn btn-danger"
                                    onclick="return confirm('Are you sure you want to delete this category?');">
