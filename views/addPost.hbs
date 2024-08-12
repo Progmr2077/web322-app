@@ -2,75 +2,64 @@
   <form method="post" action="/items/add" enctype="multipart/form-data">
     <fieldset>
       <legend>Feature Image</legend>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <input
-              class="form-control"
-              id="featureImage"
-              name="featureImage"
-              type="file"
-              aria-label="Upload feature image"
-            />
-          </div>
-        </div>
+      <div class="mb-3">
+        <label for="featureImage" class="form-label">Upload Feature Image:</label>
+        <input
+          class="form-control"
+          id="featureImage"
+          name="featureImage"
+          type="file"
+          aria-label="Upload feature image"
+        />
       </div>
     </fieldset>
-    <br />
+
     <fieldset>
       <legend>Post Content</legend>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="title">Item Name:</label>
-            <input
-              class="form-control"
-              id="title"
-              name="title"
-              type="text"
-              required
-              aria-label="Enter item name"
-            />
-          </div>
-        </div>
+
+      <div class="mb-3">
+        <label for="title" class="form-label">Item Name:</label>
+        <input
+          class="form-control"
+          id="title"
+          name="title"
+          type="text"
+          required
+          aria-label="Enter item name"
+        />
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="price">Price:</label>
-            <input
-              class="form-control"
-              id="price"
-              name="price"
-              type="text"
-              required
-              aria-label="Enter price"
-            />
-          </div>
-        </div>
+
+      <div class="mb-3">
+        <label for="price" class="form-label">Price:</label>
+        <input
+          class="form-control"
+          id="price"
+          name="price"
+          type="text"
+          required
+          aria-label="Enter price"
+        />
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="body">Description:</label>
-            <textarea
-              class="form-control"
-              id="body"
-              name="body"
-              rows="10"
-              required
-              aria-label="Enter item description"
-            ></textarea>
-          </div>
-        </div>
+
+      <div class="mb-3">
+        <label for="body" class="form-label">Description:</label>
+        <textarea
+          class="form-control"
+          id="body"
+          name="body"
+          rows="10"
+          required
+          aria-label="Enter item description"
+        ></textarea>
       </div>
+
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="category">Category:</label>
+            <label for="category" class="form-label">Category:</label>
             {{#if categories}}
               <select
-                class="form-control"
+                class="form-select"
                 name="category"
                 id="category"
                 required
@@ -82,36 +71,37 @@
                 {{/each}}
               </select>
             {{else}}
-              <div>No Categories</div>
+              <div>No Categories Available</div>
             {{/if}}
           </div>
         </div>
+
         <div class="col-md-6">
-          <div class="form-group">
-            <label for="published">Visibility:</label>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                name="published"
-                id="published"
-                aria-label="Check to publish"
-              />
-              <label class="form-check-label" for="published">
-                Published
-              </label>
-            </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="published"
+              id="published"
+              aria-label="Check to publish"
+            />
+            <label class="form-check-label" for="published">
+              Published
+            </label>
           </div>
         </div>
       </div>
     </fieldset>
+
     <hr />
+
     <div class="text-end">
-      <input
+      <button
         type="submit"
         class="btn btn-primary"
-        value="Add Post"
-      />
+      >
+        Add Post
+      </button>
     </div>
   </form>
 </div>
