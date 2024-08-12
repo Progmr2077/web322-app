@@ -1,6 +1,6 @@
 <div class="container mt-5">
   <form method="post" action="/items/add" enctype="multipart/form-data">
-    <fieldset>
+    <fieldset class="mb-4">
       <legend>Feature Image</legend>
       <div class="mb-3">
         <label for="featureImage" class="form-label">Upload Feature Image:</label>
@@ -14,7 +14,7 @@
       </div>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="mb-4">
       <legend>Post Content</legend>
 
       <div class="mb-3">
@@ -54,29 +54,27 @@
       </div>
 
       <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="category" class="form-label">Category:</label>
-            {{#if categories}}
-              <select
-                class="form-select"
-                name="category"
-                id="category"
-                required
-                aria-label="Select a category"
-              >
-                <option value="">Select Category</option>
-                {{#each categories}}
-                  <option value="{{id}}">{{category}}</option>
-                {{/each}}
-              </select>
-            {{else}}
-              <div>No Categories Available</div>
-            {{/if}}
-          </div>
+        <div class="col-md-6 mb-3">
+          <label for="category" class="form-label">Category:</label>
+          {{#if categories}}
+            <select
+              class="form-select"
+              name="category"
+              id="category"
+              required
+              aria-label="Select a category"
+            >
+              <option value="">Select Category</option>
+              {{#each categories}}
+                <option value="{{id}}">{{category}}</option>
+              {{/each}}
+            </select>
+          {{else}}
+            <div>No Categories Available</div>
+          {{/if}}
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-6 mb-3">
           <div class="form-check">
             <input
               class="form-check-input"
