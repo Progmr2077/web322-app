@@ -15,18 +15,19 @@ const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const storeService = require('./store-service');
-const clientSessions = require('client-sessions');
+const session = require('express-session');
 const authData = require('./auth-service');
+require('dotenv').config(); // Load environment variables from a .env file
 
 // Initialize Express application
 const app = express();
 
 // Middleware for session management
-app.use(clientSessions({
-  cookieName: 'session',
-  secret: 'your_secret_key',
-  duration: 30 * 60 * 1000, // 30 minutes
-  activeDuration: 5 * 60 * 1000 // 5 minutes
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 30 * 60 * 1000 } // 30 minutes
 }));
 
 app.use((req, res, next) => {
@@ -44,9 +45,9 @@ function ensureLogin(req, res, next) {
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: 'dnhzlp3mb',
-  api_key: '224993467718837',
-  api_secret: '4MbmRpIBcZhdRWWjJSl0Wt9D2dg',
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true
 });
 
@@ -86,6 +87,7 @@ const handlebars = exphbs.create({
       return lvalue !== rvalue ? options.inverse(this) : options.fn(this);
     },
     formatDate: (dateObj, options) => {
+      if (!(dateObj instanceof Date)) return options.fn(this); // Handle invalid date
       let year = dateObj.getFullYear();
       let month = (dateObj.getMonth() + 1).toString();
       let day = dateObj.getDate().toString();
@@ -120,35 +122,34 @@ app.get('/register', (req, res) => {
   res.render('register');
 });
 
-app.post('/register', (req, res) => {
-  authData.registerUser(req.body)
-    .then(() => {
-      res.render('register', { successMessage: "User created" });
-    })
-    .catch(err => {
-      res.render('register', { errorMessage: err, userName: req.body.userName });
-    });
+app.post('/register', async (req, res) => {
+  try {
+    await authData.registerUser(req.body);
+    res.render('register', { successMessage: "User created" });
+  } catch (err) {
+    res.render('register', { errorMessage: err, userName: req.body.userName });
+  }
 });
 
-app.post('/login', (req, res) => {
-  req.body.userAgent = req.get('User-Agent');
-  authData.checkUser(req.body)
-    .then(user => {
-      req.session.user = {
-        userName: user.userName,
-        email: user.email,
-        loginHistory: user.loginHistory
-      };
-      res.redirect('/items');
-    })
-    .catch(err => {
-      res.render('login', { errorMessage: err, userName: req.body.userName });
-    });
+app.post('/login', async (req, res) => {
+  try {
+    req.body.userAgent = req.get('User-Agent');
+    const user = await authData.checkUser(req.body);
+    req.session.user = {
+      userName: user.userName,
+      email: user.email,
+      loginHistory: user.loginHistory
+    };
+    res.redirect('/items');
+  } catch (err) {
+    res.render('login', { errorMessage: err, userName: req.body.userName });
+  }
 });
 
 app.get('/logout', (req, res) => {
-  req.session.reset();
-  res.redirect('/');
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
 });
 
 app.get('/userHistory', ensureLogin, (req, res) => {
@@ -176,9 +177,8 @@ app.get('/shop', async (req, res) => {
       items = await storeService.getPublishedItems();
     }
     items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
-    let item = items[0];
     viewData.items = items;
-    viewData.item = item;
+    viewData.item = items[0] || null; // Provide a default value if no items found
   } catch (err) {
     viewData.message = "no results";
   }
@@ -197,14 +197,8 @@ app.get('/shop/:id', async (req, res) => {
   let viewData = {};
 
   try {
-    let items = [];
-    if (req.query.category) {
-      items = await storeService.getPublishedItemsByCategory(req.query.category);
-    } else {
-      items = await storeService.getPublishedItems();
-    }
-    items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
-    viewData.items = items;
+    viewData.items = await storeService.getPublishedItems();
+    viewData.items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
   } catch (err) {
     viewData.message = "no results";
   }
@@ -216,8 +210,7 @@ app.get('/shop/:id', async (req, res) => {
   }
 
   try {
-    let categories = await storeService.getCategories();
-    viewData.categories = categories;
+    viewData.categories = await storeService.getCategories();
   } catch (err) {
     viewData.categoriesMessage = "no results";
   }
@@ -235,11 +228,7 @@ app.get('/items', async (req, res) => {
     } else {
       items = await storeService.getAllItems();
     }
-    if (items.length > 0) {
-      res.render('items', { items: items, category: req.query.category || null });
-    } else {
-      res.render('items', { message: "no results" });
-    }
+    res.render('items', { items: items, category: req.query.category || null });
   } catch {
     res.render('items', { message: "no results" });
   }
@@ -248,11 +237,7 @@ app.get('/items', async (req, res) => {
 app.get('/categories', async (req, res) => {
   try {
     let categories = await storeService.getCategories();
-    if (categories.length > 0) {
-      res.render('categories', { categories: categories });
-    } else {
-      res.render('categories', { message: "no results" });
-    }
+    res.render('categories', { categories: categories });
   } catch {
     res.render('categories', { message: "no results" });
   }
@@ -275,9 +260,8 @@ app.post('/categories/add', async (req, res) => {
 
 // New route to delete a category by ID
 app.get('/categories/delete/:id', async (req, res) => {
-  const categoryId = req.params.id;
   try {
-    await storeService.deleteCategoryById(categoryId);
+    await storeService.deleteCategoryById(req.params.id);
     res.redirect('/categories');
   } catch {
     res.status(500).send('Unable to Remove Category / Category not found');
@@ -286,9 +270,8 @@ app.get('/categories/delete/:id', async (req, res) => {
 
 // New route to delete an item by ID
 app.get('/items/delete/:id', async (req, res) => {
-  const itemId = req.params.id;
   try {
-    await storeService.deletePostById(itemId);
+    await storeService.deletePostById(req.params.id);
     res.redirect('/items');
   } catch {
     res.status(500).send('Unable to Remove Item / Item not found');
@@ -297,11 +280,9 @@ app.get('/items/delete/:id', async (req, res) => {
 
 app.get('/items/add', async (req, res) => {
   try {
-    // Fetch categories to populate the dropdown in the addPost view
     let categories = await storeService.getCategories();
     res.render('addPost', { title: 'Add Item', categories: categories });
   } catch {
-    // If fetching categories fails, pass an empty array
     res.render('addPost', { title: 'Add Item', categories: [] });
   }
 });
