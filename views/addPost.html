@@ -1,5 +1,5 @@
 <form method="post" action="/items/add" enctype="multipart/form-data">
-  <fieldset>
+  <fieldset class="mb-4">
     <legend>Feature Image</legend>
     <div class="mb-3">
       <label for="featureImage" class="form-label">Upload Feature Image:</label>
@@ -13,8 +13,9 @@
     </div>
   </fieldset>
 
-  <fieldset>
+  <fieldset class="mb-4">
     <legend>Post Content</legend>
+
     <div class="mb-3">
       <label for="title" class="form-label">Item Name:</label>
       <input
@@ -45,7 +46,7 @@
         class="form-control"
         id="body"
         name="body"
-        rows="15"
+        rows="10"
         required
         aria-label="Enter item description"
       ></textarea>
