@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shop</title>
-  <link rel="stylesheet" href="/styles.css">
   <!-- Add Bootstrap CSS for responsive design and styling -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <!-- Include your own styles if needed -->
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container mt-4">
@@ -19,16 +20,15 @@
             <div class="row">
               <div class="col-md-4">
                 <h2>{{data.item.title}}</h2>
-                <img src="{{data.item.featureImage}}" alt="Feature Image" class="img-fluid" />
+                <img src="{{data.item.featureImage}}" alt="{{data.item.title}}" class="img-fluid" />
               </div>
               <div class="col-md-8">
                 <div class="row">
                   <div class="col-md-12">
-                    {{data.item.body}}
-                    <br /><br />
-                    <strong>Price:</strong> ${{data.item.price}}<br />
-                    <strong>Category:</strong> {{data.item.category}}<br />
-                    <strong>Last Updated:</strong> {{data.item.postDate}}
+                    <p>{{data.item.body}}</p>
+                    <p><strong>Price:</strong> ${{data.item.price}}</p>
+                    <p><strong>Category:</strong> {{data.item.category}}</p>
+                    <p><strong>Last Updated:</strong> {{data.item.postDate}}</p>
                   </div>
                 </div>
               </div>
@@ -37,7 +37,7 @@
         {{else}}
           <div class="text-center">
             <h2>{{data.message}}</h2>
-            <p>Please try another Item / Category</p>
+            <p>Please try another item or category.</p>
           </div>
         {{/if}}
       </section>
