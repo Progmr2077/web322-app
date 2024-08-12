@@ -1,31 +1,36 @@
+/* General Body Style */
 body {
-    background-color: firebrick;
+    background-color: firebrick; /* Sets the background color for the entire page */
 }
 
+/* Heading Style */
 h2 {
-    text-align: center;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 40px;
-    color: gold;
+    text-align: center; /* Centers the heading text */
+    font-family: 'Times New Roman', Times, serif; /* Sets the font family for headings */
+    font-size: 40px; /* Sets the font size for headings */
+    color: gold; /* Sets the text color for headings */
 }
 
+/* Container Style */
 .container-fluid {
-    background-color: black;
+    background-color: black; /* Sets the background color for fluid containers */
 }
 
+/* Paragraph Style */
 p {
-    text-align: center;
-    color: white; 
+    text-align: center; /* Centers the text in paragraphs */
+    color: white; /* Sets the text color for paragraphs */
 }
 
+/* Navigation Link Styles */
 .nav-link {
-    color: white;
+    color: white; /* Sets the text color for navigation links */
 }
 
 .nav-link:hover {
-    color: lightgray; 
+    color: lightgray; /* Changes the text color on hover */
 }
 
 .nav-link.active {
-    color: gold; 
+    color: gold; /* Changes the text color for the active link */
 }
