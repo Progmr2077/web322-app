@@ -14,11 +14,14 @@ const exphbs = require('express-handlebars');
 const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const streamifier = require('streamifier');
 const storeService = require('./store-service');
-
 const clientSessions = require('client-sessions');
+const authData = require('./auth-service');
 
+// Initialize Express application
+const app = express();
+
+// Middleware for session management
 app.use(clientSessions({
   cookieName: 'session',
   secret: 'your_secret_key',
@@ -26,79 +29,18 @@ app.use(clientSessions({
   activeDuration: 5 * 60 * 1000 // 5 minutes
 }));
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   res.locals.session = req.session;
   next();
 });
 
+// Middleware for login checking
 function ensureLogin(req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
   next();
 }
-
-const authData = require('./auth-service');
-
-storeData.initialize()
-  .then(authData.initialize)
-  .then(function () {
-    app.listen(HTTP_PORT, function () {
-      console.log("app listening on: " + HTTP_PORT);
-    });
-  })
-  .catch(function (err) {
-    console.log("unable to start server: " + err);
-  });
-
-  app.get('/login', (req, res) => {
-    res.render('login');
-  });
-  
-  app.get('/register', (req, res) => {
-    res.render('register');
-  });
-  
-  app.post('/register', (req, res) => {
-    authData.registerUser(req.body)
-      .then(() => {
-        res.render('register', { successMessage: "User created" });
-      })
-      .catch(err => {
-        res.render('register', { errorMessage: err, userName: req.body.userName });
-      });
-  });
-  
-  app.post('/login', (req, res) => {
-    req.body.userAgent = req.get('User-Agent');
-    authData.checkUser(req.body)
-      .then(user => {
-        req.session.user = {
-          userName: user.userName,
-          email: user.email,
-          loginHistory: user.loginHistory
-        };
-        res.redirect('/items');
-      })
-      .catch(err => {
-        res.render('login', { errorMessage: err, userName: req.body.userName });
-      });
-  });
-  
-  app.get('/logout', (req, res) => {
-    req.session.reset();
-    res.redirect('/');
-  });
-  
-  app.get('/userHistory', ensureLogin, (req, res) => {
-    res.render('userHistory');
-  });
-  
-
-const app = express();
-
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
 
 // Configure Cloudinary
 cloudinary.config({
@@ -119,7 +61,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Custom Handlebars helpers
+// Configure Handlebars
 const handlebars = exphbs.create({
   extname: '.hbs',
   defaultLayout: 'main',
@@ -157,6 +99,11 @@ const handlebars = exphbs.create({
 app.engine('.hbs', handlebars.engine);
 app.set('view engine', '.hbs');
 
+// Middleware for static files and URL encoding
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+
+// Route definitions
 app.get('/', (req, res) => {
   res.redirect('/about');
 });
@@ -165,7 +112,50 @@ app.get('/about', (req, res) => {
   res.render('about', { title: 'About' });
 });
 
-app.get("/shop", async (req, res) => {
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+app.post('/register', (req, res) => {
+  authData.registerUser(req.body)
+    .then(() => {
+      res.render('register', { successMessage: "User created" });
+    })
+    .catch(err => {
+      res.render('register', { errorMessage: err, userName: req.body.userName });
+    });
+});
+
+app.post('/login', (req, res) => {
+  req.body.userAgent = req.get('User-Agent');
+  authData.checkUser(req.body)
+    .then(user => {
+      req.session.user = {
+        userName: user.userName,
+        email: user.email,
+        loginHistory: user.loginHistory
+      };
+      res.redirect('/items');
+    })
+    .catch(err => {
+      res.render('login', { errorMessage: err, userName: req.body.userName });
+    });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.reset();
+  res.redirect('/');
+});
+
+app.get('/userHistory', ensureLogin, (req, res) => {
+  res.render('userHistory');
+});
+
+app.get('/shop', async (req, res) => {
   let viewData = {};
 
   try {
@@ -360,12 +350,15 @@ app.post('/item/update', upload.single('featureImage'), async (req, res) => {
   }
 });
 
+// Start the server
 const HTTP_PORT = process.env.PORT || 8080;
 
-storeService.initialize().then(() => {
-  app.listen(HTTP_PORT, () => {
-    console.log(`Server listening on: ${HTTP_PORT}`);
+storeService.initialize()
+  .then(() => {
+    app.listen(HTTP_PORT, () => {
+      console.log(`Server listening on: ${HTTP_PORT}`);
+    });
+  })
+  .catch(err => {
+    console.log("Unable to start server: " + err);
   });
-}).catch((err) => {
-  console.log(err);
-});
