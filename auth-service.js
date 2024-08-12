@@ -10,7 +10,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, match: /.+\@.+\..+/ },
   loginHistory: [{
     dateTime: { type: Date, default: Date.now },
-    userAgent: String
+    userAgent: { type: String, default: '' }
   }]
 });
 
@@ -38,7 +38,7 @@ module.exports.registerUser = function (userData) {
     bcrypt.hash(userData.password, SALT_ROUNDS)
       .then(hashedPassword => {
         userData.password = hashedPassword;
-        let newUser = new User(userData);
+        const newUser = new User(userData);
         return newUser.save();
       })
       .then(() => resolve())
@@ -64,7 +64,7 @@ module.exports.checkUser = function (userData) {
             if (!isMatch) {
               return reject("Incorrect Password for user: " + userData.userName);
             }
-            user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent });
+            user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent || '' });
             return user.save();
           })
           .then(() => resolve(user))
