@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const { Schema } = mongoose;
+
+const SALT_ROUNDS = 10;
 
 const userSchema = new Schema({
   userName: { type: String, unique: true },
@@ -29,8 +32,12 @@ module.exports.registerUser = function (userData) {
     if (userData.password !== userData.password2) {
       return reject("Passwords do not match");
     }
-    let newUser = new User(userData);
-    newUser.save()
+    bcrypt.hash(userData.password, SALT_ROUNDS)
+      .then(hashedPassword => {
+        userData.password = hashedPassword;
+        let newUser = new User(userData);
+        return newUser.save();
+      })
       .then(() => resolve())
       .catch(err => {
         if (err.code === 11000) {
@@ -49,12 +56,15 @@ module.exports.checkUser = function (userData) {
         if (users.length === 0) {
           return reject("Unable to find user: " + userData.userName);
         }
-        if (users[0].password !== userData.password) {
-          return reject("Incorrect Password for user: " + userData.userName);
-        }
-        let user = users[0];
-        user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent });
-        user.save()
+        bcrypt.compare(userData.password, users[0].password)
+          .then(isMatch => {
+            if (!isMatch) {
+              return reject("Incorrect Password for user: " + userData.userName);
+            }
+            let user = users[0];
+            user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent });
+            return user.save();
+          })
           .then(() => resolve(user))
           .catch(err => reject("There was an error verifying the user: " + err));
       })
