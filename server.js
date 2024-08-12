@@ -70,7 +70,7 @@ const handlebars = exphbs.create({
       return (
         '<li class="nav-item">' +
         '<a ' +
-        (url == app.locals.activeRoute ? 'class="nav-link active" ' : 'class="nav-link" ') +
+        (url === app.locals.activeRoute ? 'class="nav-link active" ' : 'class="nav-link" ') +
         'href="' +
         url +
         '">' +
@@ -83,7 +83,7 @@ const handlebars = exphbs.create({
       if (arguments.length < 3) {
         throw new Error("Handlebars Helper equal needs 2 parameters");
       }
-      return lvalue != rvalue ? options.inverse(this) : options.fn(this);
+      return lvalue !== rvalue ? options.inverse(this) : options.fn(this);
     },
     formatDate: (dateObj, options) => {
       let year = dateObj.getFullYear();
@@ -170,16 +170,13 @@ app.get('/shop', async (req, res) => {
 
   try {
     let items = [];
-
     if (req.query.category) {
       items = await storeService.getPublishedItemsByCategory(req.query.category);
     } else {
       items = await storeService.getPublishedItems();
     }
-
     items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
     let item = items[0];
-
     viewData.items = items;
     viewData.item = item;
   } catch (err) {
@@ -201,13 +198,11 @@ app.get('/shop/:id', async (req, res) => {
 
   try {
     let items = [];
-
     if (req.query.category) {
       items = await storeService.getPublishedItemsByCategory(req.query.category);
     } else {
       items = await storeService.getPublishedItems();
     }
-
     items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
     viewData.items = items;
   } catch (err) {

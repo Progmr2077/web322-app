@@ -18,7 +18,11 @@
                         <td><a href="/items?category={{id}}">{{id}}</a></td>
                         <td><a href="/items?category={{id}}">{{category}}</a></td>
                         <td>
-                            <a href="/categories/delete/{{id}}" class="btn btn-danger">Remove</a>
+                            <a href="/categories/delete/{{id}}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this category?');">
+                               Remove
+                            </a>
                         </td>
                     </tr>
                     {{/each}}

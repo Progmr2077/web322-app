@@ -1,5 +1,4 @@
-{{!-- views/addPost.hbs --}}
-<div class="container">
+<div class="container mt-5">
   <form method="post" action="/items/add" enctype="multipart/form-data">
     <fieldset>
       <legend>Feature Image</legend>
@@ -11,6 +10,7 @@
               id="featureImage"
               name="featureImage"
               type="file"
+              aria-label="Upload feature image"
             />
           </div>
         </div>
@@ -23,7 +23,14 @@
         <div class="col-md-12">
           <div class="form-group">
             <label for="title">Item Name:</label>
-            <input class="form-control" id="title" name="title" type="text" />
+            <input
+              class="form-control"
+              id="title"
+              name="title"
+              type="text"
+              required
+              aria-label="Enter item name"
+            />
           </div>
         </div>
       </div>
@@ -31,7 +38,14 @@
         <div class="col-md-12">
           <div class="form-group">
             <label for="price">Price:</label>
-            <input class="form-control" id="price" name="price" type="text" />
+            <input
+              class="form-control"
+              id="price"
+              name="price"
+              type="text"
+              required
+              aria-label="Enter price"
+            />
           </div>
         </div>
       </div>
@@ -43,7 +57,9 @@
               class="form-control"
               id="body"
               name="body"
-              rows="15"
+              rows="10"
+              required
+              aria-label="Enter item description"
             ></textarea>
           </div>
         </div>
@@ -53,7 +69,13 @@
           <div class="form-group">
             <label for="category">Category:</label>
             {{#if categories}}
-              <select class="form-control" name="category" id="category">
+              <select
+                class="form-control"
+                name="category"
+                id="category"
+                required
+                aria-label="Select a category"
+              >
                 <option value="">Select Category</option>
                 {{#each categories}}
                   <option value="{{id}}">{{category}}</option>
@@ -67,9 +89,15 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="published">Visibility:</label>
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" name="published" id="published" />
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                name="published"
+                id="published"
+                aria-label="Check to publish"
+              />
+              <label class="form-check-label" for="published">
                 Published
               </label>
             </div>
@@ -78,10 +106,12 @@
       </div>
     </fieldset>
     <hr />
-    <input
-      type="submit"
-      class="btn btn-primary pull-right"
-      value="Add Post"
-    /><br /><br /><br />
+    <div class="text-end">
+      <input
+        type="submit"
+        class="btn btn-primary"
+        value="Add Post"
+      />
+    </div>
   </form>
 </div>

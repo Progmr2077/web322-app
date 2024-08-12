@@ -5,62 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shop</title>
   <link rel="stylesheet" href="/styles.css">
+  <!-- Add Bootstrap CSS for responsive design and styling -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
 </head>
 <body>
-  <h1>Shop</h1>
+  <div class="container mt-4">
+    <h1 class="mb-4">Shop</h1>
 
-  <div class="row">
-    <section class="main col-md-9">
-      {{#if data.item}}
-        <article>
-          <div class="row">
-            <div class="col-4">
-              <h2>{{data.item.title}}</h2>
-              <img src="{{data.item.featureImage}}" alt="Feature Image" style="width:100%" />
-            </div>
-            <div class="col-8">
-              <br /><br />
-              <div class="row">
-                <div class="col-12">
-                  {{data.item.body}}
-                  <br /><br />
-                  <strong>Price:</strong> ${{data.item.price}}<br />
-                  <strong>Category:</strong> {{data.item.category}}<br />
-                  <strong>Last Updated:</strong> {{data.item.postDate}}
+    <div class="row">
+      <section class="main col-md-9">
+        {{#if data.item}}
+          <article>
+            <div class="row">
+              <div class="col-md-4">
+                <h2>{{data.item.title}}</h2>
+                <img src="{{data.item.featureImage}}" alt="Feature Image" class="img-fluid" />
+              </div>
+              <div class="col-md-8">
+                <div class="row">
+                  <div class="col-md-12">
+                    {{data.item.body}}
+                    <br /><br />
+                    <strong>Price:</strong> ${{data.item.price}}<br />
+                    <strong>Category:</strong> {{data.item.category}}<br />
+                    <strong>Last Updated:</strong> {{data.item.postDate}}
+                  </div>
                 </div>
               </div>
             </div>
+          </article>
+        {{else}}
+          <div class="text-center">
+            <h2>{{data.message}}</h2>
+            <p>Please try another Item / Category</p>
           </div>
-        </article>
-      {{else}}
-        <div class="col-md-12 text-center">
-          <h2>{{data.message}}</h2>
-          <p>Please try another Item / Category</p>
-        </div>
-      {{/if}}
-    </section>
+        {{/if}}
+      </section>
 
-    <aside class="col-md-3">
-      {{#if data.items}}
-        <br /><br />
-        <h4>Items</h4>
-        <ul class="list-group">
-          {{#each data.items}}
-            <a href="/shop/{{this.id}}?category={{../viewingCategory}}" class="list-group-item">{{this.title}}</a>
-          {{/each}}
-        </ul>
-      {{/if}}
+      <aside class="col-md-3">
+        {{#if data.items}}
+          <h4>Items</h4>
+          <ul class="list-group">
+            {{#each data.items}}
+              <li class="list-group-item">
+                <a href="/shop/{{this.id}}?category={{../viewingCategory}}">{{this.title}}</a>
+              </li>
+            {{/each}}
+          </ul>
+        {{/if}}
 
-      {{#if data.categories}}
-        <br /><br />
-        <h4>Categories</h4>
-        <ul class="list-group">
-          {{#each data.categories}}
-            <a href="/shop?category={{this.id}}" class="list-group-item">{{category}}</a>
-          {{/each}}
-        </ul>
-      {{/if}}
-    </aside>
+        {{#if data.categories}}
+          <h4 class="mt-4">Categories</h4>
+          <ul class="list-group">
+            {{#each data.categories}}
+              <li class="list-group-item">
+                <a href="/shop?category={{this.id}}">{{this.category}}</a>
+              </li>
+            {{/each}}
+          </ul>
+        {{/if}}
+      </aside>
+    </div>
   </div>
+
+  <!-- Add Bootstrap JS for additional functionalities -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -5,30 +5,33 @@ const { Schema } = mongoose;
 const SALT_ROUNDS = 10;
 
 const userSchema = new Schema({
-  userName: { type: String, unique: true },
-  password: String,
-  email: String,
+  userName: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
+  email: { type: String, required: true, match: /.+\@.+\..+/ },
   loginHistory: [{
-    dateTime: Date,
+    dateTime: { type: Date, default: Date.now },
     userAgent: String
   }]
 });
 
+// Indexes
+userSchema.index({ userName: 1 }, { unique: true });
+
 let User;
 
 module.exports.initialize = function () {
-  return new Promise(function (resolve, reject) {
-    let db = mongoose.createConnection("connectionString");
-    db.on('error', (err) => reject(err));
-    db.once('open', () => {
-      User = db.model("users", userSchema);
-      resolve();
-    });
+  return new Promise((resolve, reject) => {
+    mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+      .then(() => {
+        User = mongoose.model('User', userSchema);
+        resolve();
+      })
+      .catch(err => reject(err));
   });
 };
 
 module.exports.registerUser = function (userData) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     if (userData.password !== userData.password2) {
       return reject("Passwords do not match");
     }
@@ -50,18 +53,17 @@ module.exports.registerUser = function (userData) {
 };
 
 module.exports.checkUser = function (userData) {
-  return new Promise(function (resolve, reject) {
-    User.find({ userName: userData.userName })
-      .then(users => {
-        if (users.length === 0) {
+  return new Promise((resolve, reject) => {
+    User.findOne({ userName: userData.userName })
+      .then(user => {
+        if (!user) {
           return reject("Unable to find user: " + userData.userName);
         }
-        bcrypt.compare(userData.password, users[0].password)
+        return bcrypt.compare(userData.password, user.password)
           .then(isMatch => {
             if (!isMatch) {
               return reject("Incorrect Password for user: " + userData.userName);
             }
-            let user = users[0];
             user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent });
             return user.save();
           })

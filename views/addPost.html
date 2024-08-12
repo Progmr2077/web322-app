@@ -9,6 +9,7 @@
             id="featureImage"
             name="featureImage"
             type="file"
+            aria-label="Upload feature image"
           />
         </div>
       </div>
@@ -21,7 +22,14 @@
       <div class="col-md-12">
         <div class="form-group">
           <label for="title">Item Name:</label>
-          <input class="form-control" id="title" name="title" type="text" />
+          <input
+            class="form-control"
+            id="title"
+            name="title"
+            type="text"
+            required
+            aria-label="Enter item name"
+          />
         </div>
       </div>
     </div>
@@ -29,7 +37,14 @@
       <div class="col-md-12">
         <div class="form-group">
           <label for="price">Price:</label>
-          <input class="form-control" id="price" name="price" type="text" />
+          <input
+            class="form-control"
+            id="price"
+            name="price"
+            type="text"
+            required
+            aria-label="Enter price"
+          />
         </div>
       </div>
     </div>
@@ -42,6 +57,8 @@
             id="body"
             name="body"
             rows="15"
+            required
+            aria-label="Enter item description"
           ></textarea>
         </div>
       </div>
@@ -50,7 +67,13 @@
       <div class="col-md-6">
         <div class="form-group">
           <label for="category">Category:</label>
-          <select class="form-control" name="category" id="category">
+          <select
+            class="form-control"
+            name="category"
+            id="category"
+            aria-label="Select category"
+            required
+          >
             <option value="1">Home, Garden</option>
             <option value="2">Electronics, Computers, Video Games</option>
             <option value="3">Clothing</option>
@@ -61,10 +84,16 @@
       </div>
       <div class="col-md-6">
         <div class="form-group">
-          <label for="category">Visibility:</label>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" name="published" id="published" />
+          <label for="published">Visibility:</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="published"
+              id="published"
+              aria-label="Check to publish"
+            />
+            <label class="form-check-label" for="published">
               Published
             </label>
           </div>
@@ -77,5 +106,6 @@
     type="submit"
     class="btn btn-primary pull-right"
     value="Add Post"
-  /><br /><br /><br />
+  />
+  <br /><br /><br />
 </form>
