@@ -17,13 +17,14 @@ const cloudinary = require('cloudinary').v2;
 const storeService = require('./store-service');
 const session = require('express-session');
 const authData = require('./auth-service');
+const mongoose = require('./db-setup'); // need to fix file
 
 // Initialize Express application
 const app = express();
 
 // Middleware for session management
 app.use(session({
-  secret: 'your_secret_key', // Replace with your actual secret key
+  secret: 'https://us-east-2.aws.data.mongodb-api.com/app/data-rwbiivl/endpoint/data/v1', 
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 30 * 60 * 1000 } // 30 minutes
@@ -44,9 +45,9 @@ function ensureLogin(req, res, next) {
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: 'your_cloud_name', // Replace with your Cloudinary cloud name
-  api_key: 'your_api_key', // Replace with your Cloudinary API key
-  api_secret: 'your_api_secret', // Replace with your Cloudinary API secret
+  cloud_name: 'dnhzlp3mb', 
+  api_key: '224993467718837', 
+  api_secret: '4MbmRpIBcZhdRWWjJSl0Wt9D2dg', 
   secure: true
 });
 

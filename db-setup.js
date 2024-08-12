@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 // Use environment variables for sensitive information
-const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/your_database';
+const dbUri = process.env.MONGODB_URI || 'mongodb+srv://jrivera17:9ALdUCokZjOP16uX@cluster0.feyf5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(dbUri, {
   useNewUrlParser: true,

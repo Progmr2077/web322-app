@@ -1,97 +1,42 @@
-const Sequelize = require('sequelize');
-const fs = require('fs');
-const path = require('path');
+// store-service.js
+const Category = require('./models/category');
+const Publication = require('./models/publication');
 
-// Set up Sequelize connection
-const sequelize = new Sequelize('JacobDB', 'JacobDB_owner', 'K82NuwEWrPBQ', {
-  host: 'ep-long-voice-a5a719e9.us-east-2.aws.neon.tech',
-  dialect: 'postgres',
-  port: 5432,
-  dialectOptions: {
-    ssl: { rejectUnauthorized: false }
-  },
-  query: { raw: true }
-});
-
-// Define the Item model
-const Item = sequelize.define('Item', {
-  body: {
-    type: Sequelize.TEXT,
-    allowNull: false
-  },
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  postDate: {
-    type: Sequelize.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.NOW // Default to current time if not provided
-  },
-  featureImage: {
-    type: Sequelize.STRING,
-    allowNull: true
-  },
-  published: {
-    type: Sequelize.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
-  price: {
-    type: Sequelize.DOUBLE,
-    allowNull: false
-  }
-});
-
-// Define the Category model
-const Category = sequelize.define('Category', {
-  category: {
-    type: Sequelize.STRING,
-    allowNull: false
-  }
-});
-
-// Define the relationship between Item and Category
-Item.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-
-// Initialize the database
+// Initialize the database (Mongoose handles connections automatically)
 module.exports.initialize = async function() {
   try {
-    await sequelize.sync();
+    // Mongoose handles connection on its own; no need to explicitly sync
+    console.log('MongoDB connected');
   } catch (err) {
-    throw new Error("Unable to sync the database: " + err.message);
+    throw new Error("Unable to connect to the database: " + err.message);
   }
 };
 
-// Get all items
-module.exports.getAllItems = async function() {
+// Get all publications
+module.exports.getAllPublications = async function() {
   try {
-    return await Item.findAll();
-  } catch (err) {
-    throw new Error("No results returned: " + err.message);
-  }
-};
-
-// Get published items
-module.exports.getPublishedItems = async function() {
-  try {
-    return await Item.findAll({
-      where: { published: true }
-    });
+    return await Publication.find().populate('categoryId');
   } catch (err) {
     throw new Error("No results returned: " + err.message);
   }
 };
 
-// Get published items by category
-module.exports.getPublishedItemsByCategory = async function(categoryId) {
+// Get published publications
+module.exports.getPublishedPublications = async function() {
   try {
-    return await Item.findAll({
-      where: {
-        published: true,
-        categoryId: categoryId
-      }
-    });
+    return await Publication.find({ published: true }).populate('categoryId');
+  } catch (err) {
+    throw new Error("No results returned: " + err.message);
+  }
+};
+
+// Get published publications by category
+module.exports.getPublishedPublicationsByCategory = async function(categoryId) {
+  try {
+    return await Publication.find({
+      published: true,
+      categoryId: categoryId
+    }).populate('categoryId');
   } catch (err) {
     throw new Error("No results returned: " + err.message);
   }
@@ -100,73 +45,61 @@ module.exports.getPublishedItemsByCategory = async function(categoryId) {
 // Get all categories
 module.exports.getCategories = async function() {
   try {
-    return await Category.findAll();
+    return await Category.find();
   } catch (err) {
     throw new Error("No results returned: " + err.message);
   }
 };
 
-// Get items by category
-module.exports.getItemsByCategory = async function(categoryId) {
+// Get publications by category
+module.exports.getPublicationsByCategory = async function(categoryId) {
   try {
-    return await Item.findAll({
-      where: { categoryId: categoryId }
-    });
+    return await Publication.find({ categoryId: categoryId }).populate('categoryId');
   } catch (err) {
     throw new Error("No results returned: " + err.message);
   }
 };
 
-// Get items by minimum date
-module.exports.getItemsByMinDate = async function(minDateStr) {
-  const { Op } = Sequelize;
+// Get publications by minimum date
+module.exports.getPublicationsByMinDate = async function(minDateStr) {
   try {
-    return await Item.findAll({
-      where: {
-        postDate: {
-          [Op.gte]: new Date(minDateStr)
-        }
-      }
-    });
+    return await Publication.find({
+      postDate: { $gte: new Date(minDateStr) }
+    }).populate('categoryId');
   } catch (err) {
     throw new Error("No results returned: " + err.message);
   }
 };
 
-// Get item by ID
-module.exports.getItemById = async function(id) {
+// Get publication by ID
+module.exports.getPublicationById = async function(id) {
   try {
-    const item = await Item.findByPk(id);
-    if (item) {
-      return item;
+    const publication = await Publication.findById(id).populate('categoryId');
+    if (publication) {
+      return publication;
     } else {
-      throw new Error("Item not found");
+      throw new Error("Publication not found");
     }
   } catch (err) {
-    throw new Error("Error fetching item: " + err.message);
+    throw new Error("Error fetching publication: " + err.message);
   }
 };
 
-// Add a new item
-module.exports.addItem = async function(itemData) {
-  itemData.published = Boolean(itemData.published);
-  
+// Add a new publication
+module.exports.addPublication = async function(publicationData) {
+  publicationData.published = Boolean(publicationData.published);
+
   // Handle empty string fields
-  for (let key in itemData) {
-    if (itemData[key] === "") {
-      itemData[key] = null;
+  for (let key in publicationData) {
+    if (publicationData[key] === "") {
+      publicationData[key] = null;
     }
   }
 
-  // Set postDate to current date if not provided
-  if (!itemData.postDate) {
-    itemData.postDate = new Date();
-  }
-
   try {
-    await Item.create(itemData);
+    await Publication.create(publicationData);
   } catch (err) {
-    throw new Error("Unable to create item: " + err.message);
+    throw new Error("Unable to create publication: " + err.message);
   }
 };
 
@@ -188,8 +121,8 @@ module.exports.addCategory = async function(categoryData) {
 // Delete a category by ID
 module.exports.deleteCategoryById = async function(id) {
   try {
-    const result = await Category.destroy({ where: { id: id } });
-    if (result > 0) {
+    const result = await Category.deleteOne({ _id: id });
+    if (result.deletedCount > 0) {
       return;
     } else {
       throw new Error("Category not found or not deleted");
@@ -199,16 +132,16 @@ module.exports.deleteCategoryById = async function(id) {
   }
 };
 
-// Delete a post by ID
-module.exports.deletePostById = async function(id) {
+// Delete a publication by ID
+module.exports.deletePublicationById = async function(id) {
   try {
-    const result = await Item.destroy({ where: { id: id } });
-    if (result > 0) {
+    const result = await Publication.deleteOne({ _id: id });
+    if (result.deletedCount > 0) {
       return;
     } else {
-      throw new Error("Post not found or not deleted");
+      throw new Error("Publication not found or not deleted");
     }
   } catch (err) {
-    throw new Error("Unable to delete post: " + err.message);
+    throw new Error("Unable to delete publication: " + err.message);
   }
 };
