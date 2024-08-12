@@ -19,6 +19,7 @@
     "homepage": "https://github.com/Progmr2077/web322-work#readme",
     "dependencies": {
         "bcryptjs": "^2.4.3",
+        "client-sessions": "^0.8.0",
         "cloudinary": "^2.2.0",
         "connect-mongodb-session": "^2.2.0",
         "express": "^4.19.2",
