@@ -155,6 +155,16 @@ app.get('/userHistory', ensureLogin, (req, res) => {
   res.render('userHistory');
 });
 
+// New route for /store
+app.get('/store', async (req, res) => {
+  try {
+    const items = await storeService.getPublishedItems();
+    res.render('store', { items: items });
+  } catch (err) {
+    res.status(500).render('error', { message: 'Unable to load store items.' });
+  }
+});
+
 app.get('/shop', async (req, res) => {
   let viewData = {};
 
