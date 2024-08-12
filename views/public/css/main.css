@@ -42,3 +42,10 @@ p {
 .nav-link.active {
     color: gold; /* Changes the text color for the active link */
 }
+
+/* Custom Styles */
+.sidebar {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+}
