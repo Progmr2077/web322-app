@@ -14,62 +14,65 @@ const userSchema = new Schema({
   }]
 });
 
+// Pre-save hook for hashing the password
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    try {
+      const hashedPassword = await bcrypt.hash(this.password, SALT_ROUNDS);
+      this.password = hashedPassword;
+    } catch (err) {
+      return next(err);
+    }
+  }
+  next();
+});
+
 // Indexes
 userSchema.index({ userName: 1 }, { unique: true });
 
 let User;
 
-module.exports.initialize = function () {
-  return new Promise((resolve, reject) => {
-    mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-      .then(() => {
-        User = mongoose.model('User', userSchema);
-        resolve();
-      })
-      .catch(err => reject(err));
-  });
+module.exports.initialize = async function () {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+    User = mongoose.model('User', userSchema);
+  } catch (err) {
+    throw new Error("Unable to connect to the database: " + err.message);
+  }
 };
 
-module.exports.registerUser = function (userData) {
-  return new Promise((resolve, reject) => {
-    if (userData.password !== userData.password2) {
-      return reject("Passwords do not match");
+module.exports.registerUser = async function (userData) {
+  if (userData.password !== userData.password2) {
+    throw new Error("Passwords do not match");
+  }
+  try {
+    const newUser = new User(userData);
+    await newUser.save();
+  } catch (err) {
+    if (err.code === 11000) {
+      throw new Error("User Name already taken");
     }
-    bcrypt.hash(userData.password, SALT_ROUNDS)
-      .then(hashedPassword => {
-        userData.password = hashedPassword;
-        const newUser = new User(userData);
-        return newUser.save();
-      })
-      .then(() => resolve())
-      .catch(err => {
-        if (err.code === 11000) {
-          reject("User Name already taken");
-        } else {
-          reject("There was an error creating the user: " + err);
-        }
-      });
-  });
+    throw new Error("There was an error creating the user: " + err.message);
+  }
 };
 
-module.exports.checkUser = function (userData) {
-  return new Promise((resolve, reject) => {
-    User.findOne({ userName: userData.userName })
-      .then(user => {
-        if (!user) {
-          return reject("Unable to find user: " + userData.userName);
-        }
-        return bcrypt.compare(userData.password, user.password)
-          .then(isMatch => {
-            if (!isMatch) {
-              return reject("Incorrect Password for user: " + userData.userName);
-            }
-            user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent || '' });
-            return user.save();
-          })
-          .then(() => resolve(user))
-          .catch(err => reject("There was an error verifying the user: " + err));
-      })
-      .catch(err => reject("Unable to find user: " + userData.userName));
-  });
+module.exports.checkUser = async function (userData) {
+  try {
+    const user = await User.findOne({ userName: userData.userName });
+    if (!user) {
+      throw new Error("Unable to find user: " + userData.userName);
+    }
+
+    const isMatch = await bcrypt.compare(userData.password, user.password);
+    if (!isMatch) {
+      throw new Error("Incorrect Password for user: " + userData.userName);
+    }
+
+    user.loginHistory.push({ dateTime: new Date(), userAgent: userData.userAgent || '' });
+    await user.save();
+
+    return user;
+  } catch (err) {
+    throw new Error("There was an error verifying the user: " + err.message);
+  }
 };
