@@ -51,6 +51,50 @@ storeData.initialize()
     console.log("unable to start server: " + err);
   });
 
+  app.get('/login', (req, res) => {
+    res.render('login');
+  });
+  
+  app.get('/register', (req, res) => {
+    res.render('register');
+  });
+  
+  app.post('/register', (req, res) => {
+    authData.registerUser(req.body)
+      .then(() => {
+        res.render('register', { successMessage: "User created" });
+      })
+      .catch(err => {
+        res.render('register', { errorMessage: err, userName: req.body.userName });
+      });
+  });
+  
+  app.post('/login', (req, res) => {
+    req.body.userAgent = req.get('User-Agent');
+    authData.checkUser(req.body)
+      .then(user => {
+        req.session.user = {
+          userName: user.userName,
+          email: user.email,
+          loginHistory: user.loginHistory
+        };
+        res.redirect('/items');
+      })
+      .catch(err => {
+        res.render('login', { errorMessage: err, userName: req.body.userName });
+      });
+  });
+  
+  app.get('/logout', (req, res) => {
+    req.session.reset();
+    res.redirect('/');
+  });
+  
+  app.get('/userHistory', ensureLogin, (req, res) => {
+    res.render('userHistory');
+  });
+  
+
 const app = express();
 
 app.use(express.static('public'));
