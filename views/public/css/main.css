@@ -1,6 +1,9 @@
 /* General Body Style */
 body {
     background-color: firebrick; /* Sets the background color for the entire page */
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif; /* Adds a default font family for body text */
 }
 
 /* Heading Style */
@@ -9,17 +12,22 @@ h2 {
     font-family: 'Times New Roman', Times, serif; /* Sets the font family for headings */
     font-size: 40px; /* Sets the font size for headings */
     color: gold; /* Sets the text color for headings */
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 /* Container Style */
 .container-fluid {
     background-color: black; /* Sets the background color for fluid containers */
+    padding: 20px; /* Adds padding inside the container */
+    border-radius: 5px; /* Optional: Adds rounded corners */
 }
 
 /* Paragraph Style */
 p {
     text-align: center; /* Centers the text in paragraphs */
     color: white; /* Sets the text color for paragraphs */
+    line-height: 1.5; /* Increases line spacing for readability */
 }
 
 /* Navigation Link Styles */
