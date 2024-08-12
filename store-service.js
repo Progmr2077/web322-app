@@ -25,7 +25,8 @@ const Item = sequelize.define('Item', {
   },
   postDate: {
     type: Sequelize.DATE,
-    allowNull: false
+    allowNull: false,
+    defaultValue: Sequelize.NOW // Default to current time if not provided
   },
   featureImage: {
     type: Sequelize.STRING,
@@ -51,7 +52,7 @@ const Category = sequelize.define('Category', {
 });
 
 // Define the relationship between Item and Category
-Item.belongsTo(Category, { foreignKey: 'categoryId' });
+Item.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
 
 // Initialize the database
 module.exports.initialize = async function() {
@@ -139,24 +140,28 @@ module.exports.getItemById = async function(id) {
     if (item) {
       return item;
     } else {
-      throw new Error("No results returned");
+      throw new Error("Item not found");
     }
   } catch (err) {
-    throw new Error("No results returned: " + err.message);
+    throw new Error("Error fetching item: " + err.message);
   }
 };
 
 // Add a new item
 module.exports.addItem = async function(itemData) {
   itemData.published = Boolean(itemData.published);
-
+  
+  // Handle empty string fields
   for (let key in itemData) {
     if (itemData[key] === "") {
       itemData[key] = null;
     }
   }
 
-  itemData.postDate = new Date();
+  // Set postDate to current date if not provided
+  if (!itemData.postDate) {
+    itemData.postDate = new Date();
+  }
 
   try {
     await Item.create(itemData);
